@@ -235,230 +235,225 @@ import Input from &apos;../_classes/input/Input&apos;;
 import _ from &apos;lodash&apos;;
 
 export default class SignatureComponent extends Input {
-  static schema(...extend) {
-    return Input.schema({
-      type: &apos;signature&apos;,
-      label: &apos;Signature&apos;,
-      key: &apos;signature&apos;,
-      footer: &apos;Sign above&apos;,
-      width: &apos;100%&apos;,
-      height: &apos;150px&apos;,
-      penColor: &apos;black&apos;,
-      backgroundColor: &apos;rgb(245,245,235)&apos;,
-      minWidth: &apos;0.5&apos;,
-      maxWidth: &apos;2.5&apos;
-    }, ...extend);
-  }
-
-  static get builderInfo() {
-    return {
-      title: &apos;Signature&apos;,
-      group: &apos;advanced&apos;,
-      icon: &apos;pencil&apos;,
-      weight: 120,
-      documentation: &apos;http://help.form.io/userguide/#signature&apos;,
-      schema: SignatureComponent.schema()
-    };
-  }
-
-  init() {
-    super.init();
-    this.currentWidth = 0;
-    this.scale = 1;
-
-    if (!this.component.width) {
-      this.component.width = &apos;100%&apos;;
+    static schema(...extend) {
+        return Input.schema({
+            type: &apos;signature&apos;,
+            label: &apos;Signature&apos;,
+            key: &apos;signature&apos;,
+            footer: &apos;Sign above&apos;,
+            width: &apos;100%&apos;,
+            height: &apos;150px&apos;,
+            penColor: &apos;black&apos;,
+            backgroundColor: &apos;rgb(245,245,235)&apos;,
+            minWidth: &apos;0.5&apos;,
+            maxWidth: &apos;2.5&apos;
+        }, ...extend);
     }
-    if (!this.component.height) {
-      this.component.height = &apos;200px&apos;;
+
+    static get builderInfo() {
+        return {
+            title: &apos;Signature&apos;,
+            group: &apos;advanced&apos;,
+            icon: &apos;pencil&apos;,
+            weight: 120,
+            documentation: &apos;http://help.form.io/userguide/#signature&apos;,
+            schema: SignatureComponent.schema()
+        };
     }
-  }
 
-  get emptyValue() {
-    return &apos;&apos;;
-  }
+    init() {
+        super.init();
+        this.currentWidth = 0;
+        this.scale = 1;
 
-  get defaultSchema() {
-    return SignatureComponent.schema();
-  }
-
-  get inputInfo() {
-    const info = super.inputInfo;
-    info.type = &apos;input&apos;;
-    info.attr.type = &apos;hidden&apos;;
-    return info;
-  }
-
-  get className() {
-    return `${super.className} signature-pad`;
-  }
-
-  labelIsHidden() {
-    return true;
-  }
-
-  setValue(value, flags) {
-    flags = flags || {};
-    const changed = super.setValue(value, flags);
-    if (value &amp;&amp; this.refs.signatureImage &amp;&amp; (!flags.noSign || this.options.readOnly)) {
-      this.refs.signatureImage.setAttribute(&apos;src&apos;, value);
-      this.showCanvas(false);
-    }
-    if (this.signaturePad) {
-      if (!value) {
-        this.signaturePad.clear();
-      }
-      else if (changed) {
-        this.triggerChange();
-      }
-    }
-    return changed;
-  }
-
-  showCanvas(show) {
-    if (show) {
-      if (this.refs.canvas) {
-        this.refs.canvas.style.display = &apos;inherit&apos;;
-      }
-      if (this.refs.signatureImage) {
-        this.refs.signatureImage.style.display = &apos;none&apos;;
-      }
-    }
-    else {
-      if (this.refs.canvas) {
-        this.refs.canvas.style.display = &apos;none&apos;;
-      }
-      if (this.refs.signatureImage) {
-        this.refs.signatureImage.style.display = &apos;inherit&apos;;
-      }
-    }
-  }
-
-  onDisabled() {
-    this.showCanvas(!super.disabled);
-    if (this.signaturePad) {
-      if (super.disabled) {
-        this.signaturePad.off();
-        if (this.refs.refresh) {
-          this.refs.refresh.classList.add(&apos;disabled&apos;);
+        if (!this.component.width) {
+            this.component.width = &apos;100%&apos;;
         }
-      }
-      else {
-        this.signaturePad.on();
-        if (this.refs.refresh) {
-          this.refs.refresh.classList.remove(&apos;disabled&apos;);
+        if (!this.component.height) {
+            this.component.height = &apos;200px&apos;;
         }
-      }
     }
-  }
 
-  checkSize(force, scale) {
-    if (force || (this.refs.padBody.offsetWidth !== this.currentWidth)) {
-      this.scale = force ? scale : this.scale;
-      this.currentWidth = this.refs.padBody.offsetWidth;
-      this.refs.canvas.width = this.currentWidth * this.scale;
-      this.refs.canvas.height = this.refs.padBody.offsetHeight * this.scale;
-      const ctx = this.refs.canvas.getContext(&apos;2d&apos;);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale((1 / this.scale), (1 / this.scale));
-      ctx.fillStyle = this.signaturePad.backgroundColor;
-      ctx.fillRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
-      this.signaturePad.clear();
+    get emptyValue() {
+        return &apos;&apos;;
     }
-  }
 
-  renderElement(value, index) {
-    return this.renderTemplate(&apos;signature&apos;, {
-      element: super.renderElement(value, index),
-      required: _.get(this.component, &apos;validate.required&apos;, false),
-    });
-  }
+    get defaultSchema() {
+        return SignatureComponent.schema();
+    }
 
-  setOpenModalElement() {
-    const template = `
+    get inputInfo() {
+        const info = super.inputInfo;
+        info.type = &apos;input&apos;;
+        info.attr.type = &apos;hidden&apos;;
+        return info;
+    }
+
+    get className() {
+        return `${super.className} signature-pad`;
+    }
+
+    labelIsHidden() {
+        return true;
+    }
+
+    setValue(value, flags) {
+        flags = flags || {};
+        const changed = super.setValue(value, flags);
+        if (value &amp;&amp; this.refs.signatureImage &amp;&amp; (!flags.noSign || this.options.readOnly)) {
+            this.refs.signatureImage.setAttribute(&apos;src&apos;, value);
+            this.showCanvas(true);
+        }
+        if (this.signaturePad) {
+            if (!value) {
+                this.signaturePad.clear();
+            } else if (changed) {
+                this.triggerChange();
+            }
+        }
+        return changed;
+    }
+
+    showCanvas(show) {
+        if (show) {
+            if (this.refs.canvas) {
+                this.refs.canvas.style.display = &apos;inherit&apos;;
+            }
+            if (this.refs.signatureImage) {
+                this.refs.signatureImage.style.display = &apos;none&apos;;
+            }
+        } else {
+            if (this.refs.canvas) {
+                this.refs.canvas.style.display = &apos;none&apos;;
+            }
+            if (this.refs.signatureImage) {
+                this.refs.signatureImage.style.display = &apos;inherit&apos;;
+            }
+        }
+    }
+
+    onDisabled() {
+        this.showCanvas(!super.disabled);
+        if (this.signaturePad) {
+            if (super.disabled) {
+                this.signaturePad.off();
+                if (this.refs.refresh) {
+                    this.refs.refresh.classList.add(&apos;disabled&apos;);
+                }
+            } else {
+                this.signaturePad.on();
+                if (this.refs.refresh) {
+                    this.refs.refresh.classList.remove(&apos;disabled&apos;);
+                }
+            }
+        }
+    }
+
+    checkSize(force, scale) {
+        if (force || (this.refs.padBody.offsetWidth !== this.currentWidth)) {
+            this.scale = force ? scale : this.scale;
+            this.currentWidth = this.refs.padBody.offsetWidth;
+            this.refs.canvas.width = this.currentWidth * this.scale;
+            this.refs.canvas.height = this.refs.padBody.offsetHeight * this.scale;
+            const ctx = this.refs.canvas.getContext(&apos;2d&apos;);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale((1 / this.scale), (1 / this.scale));
+            ctx.fillStyle = this.signaturePad.backgroundColor;
+            ctx.fillRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
+            this.signaturePad.clear();
+        }
+    }
+
+    renderElement(value, index) {
+        return this.renderTemplate(&apos;signature&apos;, {
+            element: super.renderElement(value, index),
+            required: _.get(this.component, &apos;validate.required&apos;, false),
+        });
+    }
+
+    setOpenModalElement() {
+        const template = `
       &lt;label class=&quot;control-label&quot;&gt;${this.component.label}&lt;/label&gt;&lt;br&gt;
       &lt;button lang=&apos;en&apos; class=&apos;btn btn-light btn-md open-modal-button&apos; ref=&apos;openModal&apos;&gt;Click to Sign&lt;/button&gt;
     `;
-    this.componentModal.setOpenModalElement(template);
-  }
+        this.componentModal.setOpenModalElement(template);
+    }
 
-  getModalPreviewTemplate() {
-    return `
+    getModalPreviewTemplate() {
+        return `
       &lt;label class=&quot;control-label&quot;&gt;${this.component.label}&lt;/label&gt;&lt;br&gt;
       &lt;img src=${this.dataValue} ref=&apos;openModal&apos; /&gt;
     `;
-  }
-
-  attach(element) {
-    this.loadRefs(element, { canvas: &apos;single&apos;, refresh: &apos;single&apos;, padBody: &apos;single&apos;, signatureImage: &apos;single&apos; });
-    const superAttach = super.attach(element);
-
-    this.onDisabled();
-
-    if (this.refs.refresh &amp;&amp; this.options.readOnly) {
-      this.refs.refresh.classList.add(&apos;disabled&apos;);
     }
 
-    // Create the signature pad.
-    if (this.refs.canvas) {
-      this.signaturePad = new SignaturePad(this.refs.canvas, {
-        minWidth: this.component.minWidth,
-        maxWidth: this.component.maxWidth,
-        penColor: this.component.penColor,
-        backgroundColor: this.component.backgroundColor
-      });
+    attach(element) {
+            this.loadRefs(element, { canvas: &apos;single&apos;, refresh: &apos;single&apos;, padBody: &apos;single&apos;, signatureImage: &apos;single&apos; });
+            const superAttach = super.attach(element);
 
-      this.signaturePad.onEnd = () =&gt; this.setValue(this.signaturePad.toDataURL(), {
-        noSign: true
-      });
-      this.refs.signatureImage.setAttribute(&apos;src&apos;, this.signaturePad.toDataURL());
+            this.onDisabled();
 
-      // Ensure the signature is always the size of its container.
-      if (this.refs.padBody) {
-        if (!this.refs.padBody.style.maxWidth) {
-          this.refs.padBody.style.maxWidth = &apos;100%&apos;;
+            if (this.refs.refresh &amp;&amp; this.options.readOnly) {
+                this.refs.refresh.classList.add(&apos;disabled&apos;);
+            }
+
+            // Create the signature pad.
+            if (this.refs.canvas) {
+                this.signaturePad = new SignaturePad(this.refs.canvas, {
+                    minWidth: this.component.minWidth,
+                    maxWidth: this.component.maxWidth,
+                    penColor: this.component.penColor,
+                    backgroundColor: this.component.backgroundColor
+                });
+
+                this.signaturePad.onEnd = () =&gt; this.setValue(this.signaturePad.toDataURL(), {
+                    noSign: true
+                });
+                this.refs.signatureImage.setAttribute(&apos;src&apos;, this.signaturePad.toDataURL());
+
+                // Ensure the signature is always the size of its container.
+                if (this.refs.padBody) {
+                    if (!this.refs.padBody.style.maxWidth) {
+                        this.refs.padBody.style.maxWidth = &apos;100%&apos;;
+                    }
+
+                    this.addEventListener(window, &apos;resize&apos;, _.debounce(() =&gt; this.checkSize(), 100));
+                    setTimeout(function checkWidth() {
+                        if (this.refs.padBody &amp;&amp; this.refs.padBody.offsetWidth) {
+                            this.checkSize();
+                        } else {
+                            setTimeout(checkWidth.bind(this), 200);
+                        }
+                    }.bind(this), 200);
+                }
+            }
+            this.addEventListener(this.refs.refresh, &apos;click&apos;, (event) =&gt; {
+                event.preventDefault();
+                this.showCanvas(true);
+                this.signaturePad.clear();
+                this.setValue(this.defaultValue);
+            });
+            this.setValue(this.dataValue);
+            return superAttach;
         }
+        /* eslint-enable max-statements */
 
-        this.addEventListener(window, &apos;resize&apos;, _.debounce(() =&gt; this.checkSize(), 100));
-        setTimeout(function checkWidth() {
-          if (this.refs.padBody &amp;&amp; this.refs.padBody.offsetWidth) {
-            this.checkSize();
-          }
-          else {
-            setTimeout(checkWidth.bind(this), 200);
-          }
-        }.bind(this), 200);
-      }
+    detach() {
+        if (this.signaturePad) {
+            this.signaturePad.off();
+        }
+        this.signaturePad = null;
+        this.currentWidth = 0;
+        super.detach();
     }
-    this.addEventListener(this.refs.refresh, &apos;click&apos;, (event) =&gt; {
-      event.preventDefault();
-      this.showCanvas(true);
-      this.signaturePad.clear();
-      this.setValue(this.defaultValue);
-    });
-    this.setValue(this.dataValue);
-    return superAttach;
-  }
-  /* eslint-enable max-statements */
 
-  detach() {
-    if (this.signaturePad) {
-      this.signaturePad.off();
+    getValueAsString(value) {
+        return value ? &apos;Yes&apos; : &apos;No&apos;;
     }
-    this.signaturePad = null;
-    this.currentWidth = 0;
-    super.detach();
-  }
 
-  getValueAsString(value) {
-    return value ? &apos;Yes&apos; : &apos;No&apos;;
-  }
-
-  focus() {
-    this.refs.padBody.focus();
-  }
-}
-</code></pre>
+    focus() {
+        this.refs.padBody.focus();
+    }
+}</code></pre>
 
 </div>
 
